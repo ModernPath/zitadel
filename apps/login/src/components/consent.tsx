@@ -22,7 +22,7 @@ export function ConsentScreen({
   organization?: string;
   appName?: string;
 }) {
-  const t = useTranslations();
+  const t = useTranslations("device");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();
@@ -43,29 +43,23 @@ export function ConsentScreen({
     onSuccess(response);
   }
 
-  const scopes = scope?.filter((s) => !!s);
+  const requestedScopes = scope?.filter((s) => s.trim()) ?? [];
+  const scopes = requestedScopes.length ? requestedScopes : ["openid"];
 
   return (
-    <div className="flex w-full flex-col items-center space-y-4 pt-4">
+    <div className="flex w-full min-w-0 flex-col items-center space-y-4 pt-4">
       <ul className="w-full list-disc space-y-2">
-        {scopes?.length === 0 && (
-          <span className="border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex w-full flex-row items-center rounded-md border px-4 py-2 text-sm transition-all">
-            <Translated i18nKey="scope.openid" namespace="device" />
-          </span>
-        )}
-        {scopes?.map((s) => {
-          const translationKey = `device.scope.${s}`;
-          const description = t(translationKey);
-
-          // Check if the key itself is returned and provide a fallback
-          const resolvedDescription = description === translationKey ? "" : description;
+        {scopes.map((s) => {
+          const translationKey = `scope.${s}`;
+          const description = t.has(translationKey) ? t(translationKey) : s;
+          const resolvedDescription = description.trim() || s;
 
           return (
             <li
               key={s}
               className="border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex w-full flex-row items-center rounded-md border px-4 py-2 text-sm transition-all"
             >
-              <span>{resolvedDescription}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{resolvedDescription}</span>
             </li>
           );
         })}
@@ -79,7 +73,7 @@ export function ConsentScreen({
         </span>
       </p>
 
-      <p className="ztdl-p text-left text-xs">
+      <p className="ztdl-p text-left text-xs [overflow-wrap:anywhere]">
         <Translated i18nKey="request.disclaimer" namespace="device" data={{ appName: appName }} />
       </p>
 
@@ -89,7 +83,7 @@ export function ConsentScreen({
         </div>
       )}
 
-      <div className="mt-4 flex w-full flex-row items-center">
+      <div className="mt-4 grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-2">
         <Button
           onClick={() =>
             run(
@@ -99,11 +93,11 @@ export function ConsentScreen({
           }
           variant={ButtonVariants.Secondary}
           data-testid="deny-button"
+          className="h-auto! min-h-11 w-full min-w-0 justify-center py-2 text-center leading-snug [overflow-wrap:anywhere] whitespace-normal"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}
-          <Translated i18nKey="request.deny" namespace="device" />
+          {loading && <Spinner className="mr-2 h-5 w-5 shrink-0" />}
+          <Translated i18nKey="request.deny" namespace="device" className="min-w-0" />
         </Button>
-        <span className="flex-grow"></span>
 
         <Button
           onClick={() =>
@@ -114,11 +108,11 @@ export function ConsentScreen({
           }
           disabled={loading}
           data-testid="submit-button"
-          className="self-end"
+          className="h-auto! min-h-11 w-full min-w-0 justify-center py-2 text-center leading-snug [overflow-wrap:anywhere] whitespace-normal"
           variant={ButtonVariants.Primary}
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}
-          <Translated i18nKey="request.submit" namespace="device" />
+          {loading && <Spinner className="mr-2 h-5 w-5 shrink-0" />}
+          <Translated i18nKey="request.submit" namespace="device" className="min-w-0" />
         </Button>
       </div>
     </div>
